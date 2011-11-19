@@ -129,7 +129,7 @@ class PuyoGame(object):
                     return True
                 else:
                     return False
-        elif self.onPuyo%4 == 3:
+        else:
             if left:
                 if self.is_moveable(self.mainPuyo["x"] ,self.mainPuyo["y"]+1):
                     self.subPuyo["x"] = self.mainPuyo["x"]
@@ -158,8 +158,6 @@ class PuyoGame(object):
                     return True
                 else:
                     return False
-        else:
-            raise "ERROR:onPuyo's value is irregular"
 
     def check_chain(self):
         """
@@ -221,7 +219,6 @@ class PuyoGame(object):
     def next(self):
         """
         this method will progress game
-        and return times of chain or -1
         """
         if not self.chaining:
             if self.mainPuyo == None:
@@ -268,86 +265,20 @@ class PuyoGame(object):
         else:
             return False
 
-def main():
-    puyo2 = PuyoGame()
-
-    def printfield():
-        for y in xrange(len(puyo2.GameField)):
-            for x in xrange(len(puyo2.GameField[y])):
-                if puyo2.mainPuyo["x"] == x and puyo2.mainPuyo["y"] == y and not puyo2.chaining:
-                    print "[%d]"%puyo2.mainPuyo["color"],
-                elif puyo2.subPuyo["x"] == x and puyo2.subPuyo["y"] == y and not puyo2.chaining:
-                    print "[%d]"%puyo2.subPuyo["color"],
-                elif puyo2.GameField[y][x] != 0:
-                    print "(%d)"%puyo2.GameField[y][x],
-                else:
-                    print "%2d"%0,
-            print ""
-        return
-
-    def printparm():
-        print puyo2.__dict__
-
-    def nexts():
-        code = puyo2.next()
-        if code == -2:
-            print"GameOver"
-            exit()
-        printfield()
-        if code >= 1:
-            print "%dchain!"%code
-
-    def turn():
-        puyo2.turn()
-        printfield()
-
-    def r_turn():
-        puyo2.turn(left=True)
-        printfield()
-
-    def quick_drop():
-        while 1:
-            code = puyo2.next()
-            if code == -1:continue
-            elif code == -2:
-                print "GameOver"
-                exit()
-            else:
-                if code >= 1:
-                    print "%dchain!"%code
-                break
-        printfield()
-
-    def move():
-        alw = raw_input("right or left:")
-        puyo2.move(1) if alw=="r" else puyo2.move(-1)
-        printfield()
-
-
-    fancs = {"n":nexts ,"q":quick_drop ,"d":puyo2.drop ,"m":move ,"t":turn ,"r":r_turn ,"pf":printfield ,"pp":printparm ,"e":exit}
-    while 1:
-        print "commands",
-        print fancs.keys()
-        command = raw_input("command:")
-        try:
-            fancs[command]()
-        except KeyError:
-            print "not defined the command"
-
 def LoadImage(name):
     """
-    ファイル名から画像を読み込む
+    load image from file name and change sxale
     """
-    Path = os.path.join("img" ,name)
-    Image = pygame.image.load(Path).convert_alpha()
-    Rect = Image.get_rect()
-    Image = pygame.transform.scale(Image ,(32 ,32))
-    return Image
+    path = os.path.join("img" ,name)
+    image = pygame.image.load(path).convert_alpha()
+    rect = image.get_rect()
+    image = pygame.transform.scale(image ,(32 ,32))
+    return image
 
-def mainGUI():
+def main():
     pygame.init()
     screen = pygame.display.set_mode((6*32 ,13*32))
-    pygame.display.set_caption("ぷよぷよ")
+    pygame.display.set_caption("Puyo2")
     clock = pygame.time.Clock()
     spend_time = 0
     puyo2 = PuyoGame()
@@ -356,11 +287,9 @@ def mainGUI():
     while 1:
         clock.tick(60)
         spend_time += 1
-        if spend_time%60 == 0:
+        if spend_time%60 == 0 or (spend_time%30 == 0 and puyo2.chaining):
             puyo2.next()
-        elif spend_time%30 == 0 and puyo2.chaining:
-            puyo2.next()
-        screen.fill((0 ,0 ,0))
+         screen.fill((0 ,0 ,0))
         for y in xrange(len(puyo2.GameField)):
             for x in xrange(len(puyo2.GameField[y])):
                 if puyo2.GameField[y][x] != 0:
@@ -390,4 +319,4 @@ def mainGUI():
                     puyo2.turn()
 
 if __name__  == '__main__':
-    mainGUI()
+    main()
