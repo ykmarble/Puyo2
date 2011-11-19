@@ -289,7 +289,7 @@ def main():
         spend_time += 1
         if spend_time%60 == 0 or (spend_time%30 == 0 and puyo2.chaining):
             puyo2.next()
-         screen.fill((0 ,0 ,0))
+        screen.fill((0 ,0 ,0))
         for y in xrange(len(puyo2.GameField)):
             for x in xrange(len(puyo2.GameField[y])):
                 if puyo2.GameField[y][x] != 0:
